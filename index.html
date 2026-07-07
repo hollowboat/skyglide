@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flappy Game</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ OPENING SCREEN ============ -->
+  <div id="screen-opening" class="screen active">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="opening-overlay">
+        <div class="menu-options">
+          <button id="btn-start" class="menu-btn">START</button>
+          <button id="btn-skins" class="menu-btn">SKINS</button>
+        </div>
+        <button id="btn-google-login-opening" class="google-btn">
+          <span class="google-icon">G</span> LOGIN TO SET HIGHSCORE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SKINS SCREEN ============ -->
+  <div id="screen-skins" class="screen">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="skins-overlay">
+        <h2>SKINS</h2>
+        <div class="coin-display">Coins: <span id="skins-coin-count">0</span></div>
+        <div id="skins-grid" class="skins-grid"></div>
+        <button id="btn-skins-back" class="menu-btn small">BACK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <div id="screen-game" class="screen">
+    <div class="game-frame">
+      <canvas id="game-canvas"></canvas>
+      <div class="hud">
+        <div id="hud-score">0</div>
+        <div id="hud-ego-tracker"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAME OVER SCREEN ============ -->
+  <div id="screen-gameover" class="screen">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="gameover-overlay">
+        <h2>GAME OVER</h2>
+
+        <div class="stats-row">
+          <div class="stat"><span class="stat-label">Coins</span><span id="go-coins" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">Score</span><span id="go-score" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">HighScore</span><span id="go-highscore" class="stat-value">0</span></div>
+        </div>
+
+        <!-- Shown only if logged in -->
+        <div id="go-rank-progress" class="rank-progress"></div>
+
+        <!-- Shown only if NOT logged in AND reached top 30 -->
+        <div id="go-login-shout" class="login-shout hidden">
+          <div class="shout-text">LOGIN TO SAVE YOUR HIGH SCORE IN LEADERBOARD!</div>
+          <button id="btn-google-login-gameover" class="google-btn large">
+            <span class="google-icon">G</span> Sign in with Google
+          </button>
+        </div>
+
+        <div class="gameover-menu">
+          <button id="btn-retry" class="menu-btn">RETRY</button>
+          <button id="btn-change-skin" class="menu-btn">CHANGE SKIN</button>
+          <button id="btn-leaderboard-or-login" class="menu-btn">LEADERBOARD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ LEADERBOARD SCREEN ============ -->
+  <div id="screen-leaderboard" class="screen">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="leaderboard-overlay">
+        <h2>GLOBAL TOP 30</h2>
+        <div class="leaderboard-table-wrap">
+          <table class="leaderboard-table">
+            <thead>
+              <tr><th>Rank</th><th>Player</th><th>Score</th></tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+          </table>
+        </div>
+        <button id="btn-leaderboard-back" class="menu-btn small">BACK</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<audio id="sfx-ding" src="sounds/ding.mp3" preload="auto"></audio>
+
+<!-- Firebase SDKs (compat build - simplest for plain JS, no bundler needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script src="js/firebase-init.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/leaderboard.js"></script>
+<script src="js/skins.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
