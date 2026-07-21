@@ -219,7 +219,7 @@ const Game = {
     const speedRatio = this.speed / this._unitSpeed;
     const mobileMultiplier = this.width < 700 ? 1.5 : 1.0;
     return this.basePipeGapXPx * speedRatio * mobileMultiplier;
- }
+ },
 
   _spawnPipe(x) {
     const margin = this.height * 0.074;
