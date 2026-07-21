@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Flappy Game</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ OPENING SCREEN ============ -->
+  <div id="screen-opening" class="screen active">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="opening-overlay">
+        <div class="menu-options">
+          <button id="btn-play" class="menu-btn">PLAY</button>
+          <button id="btn-skins" class="menu-btn">SKINS</button>
+          <button id="btn-exit" class="menu-btn">EXIT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SKINS SCREEN ============ -->
+  <div id="screen-skins" class="screen">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="skins-overlay">
+        <h2>SKINS</h2>
+        <div class="coin-display">Coins: <span id="skins-coin-count">0</span></div>
+        <div id="skins-grid" class="skins-grid"></div>
+        <button id="btn-skins-back" class="menu-btn small">BACK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <div id="screen-game" class="screen">
+    <div class="game-frame">
+      <canvas id="game-canvas"></canvas>
+      <div class="hud">
+        <div id="hud-score">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ GAME OVER SCREEN ============ -->
+  <div id="screen-gameover" class="screen">
+    <div class="game-frame">
+      <img class="bg-image" src="images/Background.png" alt="background" />
+      <div class="gameover-overlay">
+        <h2>GAME OVER</h2>
+
+        <div class="stats-row">
+          <div class="stat"><span class="stat-label">Coins</span><span id="go-coins" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">Score</span><span id="go-score" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">HighScore</span><span id="go-highscore" class="stat-value">0</span></div>
+        </div>
+
+        <div class="gameover-menu">
+          <button id="btn-retry" class="menu-btn">RETRY</button>
+          <button id="btn-change-skin" class="menu-btn">SKINS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<audio id="sfx-ding" src="sounds/ding.mp3" preload="auto"></audio>
+
+<script src="js/engine.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
