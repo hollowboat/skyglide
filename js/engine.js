@@ -100,17 +100,17 @@ const Game = {
     gravity: 0.000463,      // relative to height, applied per 60fps-equivalent frame
     flapStrength: -0.011481,// relative to height
     maxFallSpeed: 0.014815, // relative to height
-    pipeGapY: 0.50,       // relative to height
+    pipeGapY: 0.45,       // relative to height
     pipeWidth: 0.104167,    // relative to width
-    basePipeGapX: 0.5500,   // relative to width, at speed multiplier 1.0
+    basePipeGapX: 0.490,   // relative to width, at speed multiplier 1.0
     unitSpeed: 0.0020833    // relative to width, pipe speed AT multiplier 1.0
   },
 
   // Speed multiplier progression: starts slow, steps up every few points,
   // and stops increasing once it hits the cap.
-  speedMultiplierMin: 0.8,
+  speedMultiplierMin: 1.0,
   speedMultiplierMax: 10.0,
-  speedMultiplierStep: 0.2,
+  speedMultiplierStep: 0.4,
   speedMultiplierStepScore: 5,  // bump the step every N points
 
   speed: 0,        // current pipe speed, in real px/frame-equivalent (derived, not a ratio)
