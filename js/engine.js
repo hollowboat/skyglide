@@ -108,7 +108,7 @@ const Game = {
 
   // Speed multiplier progression: starts slow, steps up every few points,
   // and stops increasing once it hits the cap.
-  speedMultiplierMin: 1.0,
+  speedMultiplierMin: 0.8,
   speedMultiplierMax: 10.0,
   speedMultiplierStep: 0.4,
   speedMultiplierStepScore: 5,  // bump the step every N points
