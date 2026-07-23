@@ -219,7 +219,7 @@ const Game = {
     const mobileMultiplier = this.width < 700 ? 1.5 : 1.0;
     return this.basePipeGapXPx * mobileMultiplier;
  }
-
+  
   _spawnPipe(x) {
     const margin = this.height * 0.074;
     const gapCenter = margin + Math.random() * (this.height - margin * 2 - this.pipeGapY) + this.pipeGapY / 2;
