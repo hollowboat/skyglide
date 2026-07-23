@@ -214,11 +214,10 @@ const Game = {
     }
   },
 
-  _currentPipeGapX() {
+ _currentPipeGapX() {
     const mobileMultiplier = this.width < 700 ? 1.5 : 1.0;
-    // Dynamic gap distance relative to speed ratio keeps pipe timing smooth & consistent
-    const speedRatio = this._unitSpeed > 0 ? (this.speed / this._unitSpeed) : 1;
-    return this.basePipeGapXPx * mobileMultiplier * speedRatio;
+    // Returns a fixed physical distance, completely ignoring the current speed
+    return this.basePipeGapXPx * mobileMultiplier;
   },
   
   _spawnPipe(x) {
