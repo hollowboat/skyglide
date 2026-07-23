@@ -108,9 +108,9 @@ const Game = {
 
   // Speed multiplier progression: starts slow, steps up every few points,
   // and stops increasing once it hits the cap.
-  speedMultiplierMin: 0.8,
+  speedMultiplierMin: 1.0,
   speedMultiplierMax: 10.0,
-  speedMultiplierStep: 0.4,
+  speedMultiplierStep: 0.5,
   speedMultiplierStepScore: 5,  // bump the step every N points
 
   speed: 0,        // current pipe speed, in real px/frame-equivalent (derived, not a ratio)
