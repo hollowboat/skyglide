@@ -1,4 +1,4 @@
-// ============ APP ============
+// ============ APP ===========
 // Screen/UI management and all event wiring — the DOM-facing half of the
 // game (engine.js holds state/physics/Firebase and has no DOM dependencies
 // of its own besides reading a couple of #ids).
