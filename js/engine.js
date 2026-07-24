@@ -4,6 +4,7 @@
 
 // ---------- Local storage (all game state lives here) ----------
 const STORAGE_KEYS = {
+  playerName: "playerName",
   coins: "coins",
   highScore: "highScore",
   unlockedSkins: "unlockedSkins",
@@ -11,6 +12,12 @@ const STORAGE_KEYS = {
 };
 
 const LocalState = {
+  getPlayerName() {
+    return localStorage.getItem(STORAGE_KEYS.playerName) || "";
+  },
+  setPlayerName(name) {
+    localStorage.setItem(STORAGE_KEYS.playerName, name);
+  },
   getCoins() {
     return Number(localStorage.getItem(STORAGE_KEYS.coins)) || 0;
   },
@@ -74,6 +81,79 @@ function equipSkin(level) {
   if (level > LocalState.getUnlockedSkins()) return false;
   LocalState.setCurrentSkin(level);
   return true;
+}
+
+// ---------- Leaderboard (Firebase Firestore, no login) ----------
+// The whole Top 20 lives in a single document so reads/sorts/truncation
+// are all one round trip — no composite queries, no auth required. Write
+// access is restricted to this one document path via Firestore security
+// rules (see firestore.rules), not via any login flow.
+const firebaseConfig = {
+  apiKey: "AIzaSyDQHGHt9XeQ0HG70vfC0fu-qT5VtsISKFY",
+  authDomain: "hollowboat1.firebaseapp.com",
+  projectId: "hollowboat1",
+  storageBucket: "hollowboat1.firebasestorage.app",
+  messagingSenderId: "728130419053",
+  appId: "1:728130419053:web:76d3030cc19133924e4264",
+  measurementId: "G-J7HXBWHHKJ"
+};
+
+firebase.initializeApp(firebaseConfig);
+const firestoreDb = firebase.firestore();
+
+const LEADERBOARD_MAX = 20;
+const leaderboardDocRef = firestoreDb.collection("leaderboard").doc("top20");
+
+// Returns the current Top 20 as [{name, score}, ...] sorted highest first.
+// Empty array if the leaderboard doesn't exist yet (first-ever score).
+async function fetchLeaderboard() {
+  const snap = await leaderboardDocRef.get();
+  if (!snap.exists) return [];
+  const data = snap.data();
+  return Array.isArray(data.entries) ? data.entries : [];
+}
+
+// Silent check — fetches the current list and compares against the lowest
+// qualifying score. Always eligible if the board isn't full yet.
+async function checkLeaderboardEligibility(score) {
+  const entries = await fetchLeaderboard();
+  if (entries.length < LEADERBOARD_MAX) return true;
+  const lowestScore = entries[entries.length - 1].score; // entries are kept sorted descending
+  return score > lowestScore;
+}
+
+// Re-fetches fresh, checks if the player already exists, updates their score 
+// only if it's higher, sorts descending, and keeps only the top 20.
+async function saveLeaderboardEntry(name, score) {
+  const entries = await fetchLeaderboard();
+
+  // 1. Check if this player is already on the leaderboard
+  const existingIndex = entries.findIndex(e => e.name === name);
+  
+  if (existingIndex >= 0) {
+    // Player exists! Only update them if this is a new high score
+    if (score > entries[existingIndex].score) {
+      entries[existingIndex].score = score;
+      entries[existingIndex]._t = Date.now(); // update tiebreaker time
+    }
+  } else {
+    // 2. Player is new, add them to the array
+    entries.push({ name, score, _t: Date.now() });
+  }
+
+  // 3. Sort descending
+  entries.sort((a, b) => b.score - a.score || (a._t || 0) - (b._t || 0));
+
+  // 4. Trim to Top 20 and find their new rank
+  const trimmedWithTiebreaker = entries.slice(0, LEADERBOARD_MAX);
+  const rankIndex = trimmedWithTiebreaker.findIndex(e => e.name === name); // match by name now
+  
+  const trimmed = trimmedWithTiebreaker.map(({ name, score }) => ({ name, score }));
+
+  // 5. Save back to Firestore
+  await leaderboardDocRef.set({ entries: trimmed });
+
+  return { rank: rankIndex >= 0 ? rankIndex + 1 : null, entries: trimmed };
 }
 
 // ---------- Core game (physics, collision, rendering) ----------
@@ -187,6 +267,7 @@ const Game = {
     };
 
     this.running = true;
+    this.paused = false;
     this._spawnInitialPipes();
     // Grace period in real milliseconds (not frame count) so it lasts the
     // same amount of real time regardless of screen refresh rate.
@@ -195,8 +276,24 @@ const Game = {
     requestAnimationFrame((t) => this._loop(t));
   },
 
+  // Pausing stops the loop entirely (no wasted rAF calls) rather than just
+  // skipping updates — the canvas simply freezes on its last rendered frame.
+  pause() {
+    if (!this.running || this.paused) return;
+    this.paused = true;
+  },
+
+  resume() {
+    if (!this.running || !this.paused) return;
+    this.paused = false;
+    // Reset the timestamp so the first frame back doesn't see a huge
+    // elapsed-time gap (which the dt clamp would otherwise have to eat).
+    this._lastTimestamp = null;
+    requestAnimationFrame((t) => this._loop(t));
+  },
+
   flap() {
-    if (!this.running) return;
+    if (!this.running || this.paused) return;
     this.bird.vy = this.flapStrength;
 
     const tap = document.getElementById("sfx-tap");
@@ -214,7 +311,7 @@ const Game = {
     }
   },
 
- _currentPipeGapX() {
+  _currentPipeGapX() {
     const mobileMultiplier = this.width < 700 ? 1.5 : 1.0;
     // Returns a fixed physical distance, completely ignoring the current speed
     return this.basePipeGapXPx * mobileMultiplier;
@@ -237,7 +334,7 @@ const Game = {
   },
 
   _loop(timestamp) {
-    if (!this.running) return;
+    if (!this.running || this.paused) return;
 
     if (this._lastTimestamp === null) this._lastTimestamp = timestamp;
     const elapsedMs = timestamp - this._lastTimestamp;
@@ -370,13 +467,6 @@ const Game = {
   _render() {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.width, this.height);
-
-    // Sky gradient matching the background art's misty blue tones
-    const sky = ctx.createLinearGradient(0, 0, 0, this.height);
-    sky.addColorStop(0, "#3f8fd6");
-    sky.addColorStop(1, "#bfe8f5");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, this.width, this.height);
 
     // Pipes
     for (const pipe of this.pipes) {
