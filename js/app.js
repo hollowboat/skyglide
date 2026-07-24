@@ -247,8 +247,8 @@ const UI = {
 
     if (errorEl) errorEl.textContent = "";
 
-    if (name.length < 3 || name.length > 10) {
-      if (errorEl) errorEl.textContent = "Name must be 3–10 characters.";
+    if (name.length < 3 || name.length > 15) {
+      if (errorEl) errorEl.textContent = "Name must be 3–15 characters.";
       return;
     }
 
